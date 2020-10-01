@@ -1,0 +1,11 @@
+Green square is you
+Focus on the canvas and press wasd to move around
+
+red giant thing is boss
+boss will spawn enemies
+
+if you touch enemies you lose health
+0 health = restart
+
+you can kill enemies by doing dash with space bar and hitting them while the dash is still on
+you can also press shift to go faster
