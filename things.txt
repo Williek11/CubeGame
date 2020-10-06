@@ -1,0 +1,21 @@
+-= Changes =-
+
+1. Code runs way faster (when first testing it ran about 2 times faster, altough with the current changes it may be about the same performance-wise)
+2. The boss uses ink bombs instead of ink magic
+3. Added menu
+* level selector
+** levels include enemies and text
+
+=- ToDo (probably too high expectations but we're goin' with it) =-
+
+1. beautify menu with CSS
+2. level creator
+* drag and drop enemies and the map gets saved onto your local storage and you can then play on it
+3. more bosses
+4. inventory system (maaybe)
+** use weapons to kill enemies instead of only dashes
+** obtained by bosses
+5. dungeon exploration-like feeling (maaaaaaaaaaaaaaaaybe and probably a strech for my *cough* lack of skills *weird face*)
+** get even more loot
+** levels get longer and have different stages divided in cubes (something like the grid system like arrow.io multiplayer, in which the map is divided in cubes)
+6. Optimizations so that game go BRRRRRRRRR
