@@ -1,10 +1,20 @@
 -= Changes =-
 
+Update ago
+
 1. Code runs way faster (when first testing it ran about 2 times faster, altough with the current changes it may be about the same performance-wise)
 2. The boss uses ink bombs instead of ink magic
 3. Added menu
 * level selector
 ** levels include enemies and text
+
+Update now
+
+1. Themes
+* Dark Theme
+ ToDo
+* Black and White Theme 
+* Customizable Themes
 
 =- ToDo (probably too high expectations but we're goin' with it) =-
 
