@@ -16,6 +16,9 @@ Update now
 * Black and White Theme 
 * Customizable Themes
 
+2. Optimizations
+* Yes
+
 =- ToDo (probably too high expectations but we're goin' with it) =-
 
 1. beautify menu with CSS
