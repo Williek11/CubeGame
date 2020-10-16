@@ -1,6 +1,11 @@
 -= Changes =-
+Fake Beta V 0.1
+The one where it starts
 
-Update ago
+1. Things exist
+
+Fake Beta V 0.2
+The playable one
 
 1. Code runs way faster (when first testing it ran about 2 times faster, altough with the current changes it may be about the same performance-wise)
 2. The boss uses ink bombs instead of ink magic
@@ -8,16 +13,26 @@ Update ago
 * level selector
 ** levels include enemies and text
 
-Update now
+Fake Beta V 0.3
+The one with colors
 
 1. Themes
 * Dark Theme
+* Black and White Theme
  ToDo
-* Black and White Theme 
 * Customizable Themes
 
 2. Optimizations
 * Yes
+
+Fake Beta V 0.4
+The one with dungeons
+
+1. Github Backups
+
+On the works:
+ToDo - 5 : dungeon exploration-like feeling
+Why : If I do it too late, I will have to rewrite tons and tons of code. Too much, alright! That's too much!
 
 =- ToDo (probably too high expectations but we're goin' with it) =-
 
@@ -31,4 +46,4 @@ Update now
 5. dungeon exploration-like feeling (maaaaaaaaaaaaaaaaybe and probably a strech for my *cough* lack of skills *weird face*)
 ** get even more loot
 ** levels get longer and have different stages divided in cubes (something like the grid system like arrow.io multiplayer, in which the map is divided in cubes)
-6. Optimizations so that game go BRRRRRRRRR
+6. Optimizations. Lots of it.
