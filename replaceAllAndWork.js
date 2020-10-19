@@ -4,71 +4,6 @@ document.getElementsByTagName("html")[0].innerHTML = `
 
 <head>
     <title>William's Playground</title>
-    <script>
-    if(localStorage.knowV2 === undefined) {
-        localStorage.knowV1 = undefined
-        localStorage.knowV2 = true
-        localStorage.active = JSON.stringify([false, false, false])
-        localStorage.customColors = JSON.stringify({
-                HTML: {
-                    menu: {
-                        background: "#aaa",
-                        color: "#fff",
-                        textShadow: "#000",
-                        container: {
-                            background: "#ccc",
-                            background_top: "#ddd",
-                            background_bottom: "#ccc",
-                            shadow: "#666",
-                            borderColor: "#000",
-                            borderRadius: "20px",
-                            borderThickness: "0",
-                        }
-                    },
-                    levelSelector: {
-                        background: "#222",
-                        text: "#fff",
-                        circleLevel: {
-                            background: "#aaa",
-                            shadow: "#000",
-                            color: "#000"
-                        }
-                    },
-                    backButton: {
-                        background: "#111",
-                        text: "#fff",
-                        border: "#000",
-                        borderRadius: "5px",
-                        borderThickness: "1px",
-                        shadow: "#000",
-                        shadowOffsetY: "2px",
-                        shadowOffsetX: "0",
-                        shadowBlur: "5px",
-                    },
-                    game: {
-                        background: "#fff",
-                        text: "#000",
-                    }
-                },
-                entities: {
-                    enemy: {
-                        normal: "#FF0000",
-                        hit: "#AA0000",
-                    },
-                    bonus: {
-                        health: "#FFFF00",
-                    },
-                    bonusMove: {
-                        slow: "#000000"
-                    },
-                    projectile: {
-                        bullet: "#FF00FF",
-                        missile: "#FF881C"
-                    }
-                }
-            })
-    }
-    </script>
     <style id="colorStyle">
         :root {
             --menu-background:#aaa;
@@ -330,6 +265,70 @@ body, html {margin:0;padding:0;text-align:center;font-family:Oxanium;overflow:hi
 
 * {font-weight:600}
 </style>`
+
+if(localStorage.knowV2 === undefined) {
+        localStorage.knowV1 = undefined
+        localStorage.knowV2 = true
+        localStorage.active = JSON.stringify([false, false, false])
+        localStorage.customColors = JSON.stringify({
+                HTML: {
+                    menu: {
+                        background: "#aaa",
+                        color: "#fff",
+                        textShadow: "#000",
+                        container: {
+                            background: "#ccc",
+                            background_top: "#ddd",
+                            background_bottom: "#ccc",
+                            shadow: "#666",
+                            borderColor: "#000",
+                            borderRadius: "20px",
+                            borderThickness: "0",
+                        }
+                    },
+                    levelSelector: {
+                        background: "#222",
+                        text: "#fff",
+                        circleLevel: {
+                            background: "#aaa",
+                            shadow: "#000",
+                            color: "#000"
+                        }
+                    },
+                    backButton: {
+                        background: "#111",
+                        text: "#fff",
+                        border: "#000",
+                        borderRadius: "5px",
+                        borderThickness: "1px",
+                        shadow: "#000",
+                        shadowOffsetY: "2px",
+                        shadowOffsetX: "0",
+                        shadowBlur: "5px",
+                    },
+                    game: {
+                        background: "#fff",
+                        text: "#000",
+                    }
+                },
+                entities: {
+                    enemy: {
+                        normal: "#FF0000",
+                        hit: "#AA0000",
+                    },
+                    bonus: {
+                        health: "#FFFF00",
+                    },
+                    bonusMove: {
+                        slow: "#000000"
+                    },
+                    projectile: {
+                        bullet: "#FF00FF",
+                        missile: "#FF881C"
+                    }
+                }
+            })
+    }
 
 const $F = [
     ()=>{if(Math.round(Math.random()) === 1) {return Math.random()} else {return Math.random() * -1}},
