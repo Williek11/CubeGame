@@ -4,48 +4,6 @@ document.getElementsByTagName("html")[0].innerHTML = `
 
 <head>
     <title>William's Playground</title>
-    <style id="colorStyle">
-        :root {
-            --menu-background:#aaa;
-            --menu-color:#fff;
-            --menu-shadow: #000;
-            --menu_container-background: #ccc;
-            --menu_container-background-top: #ddd;
-            --menu_container-background-bottom: #ccc;
-            --menu_container-shadow: #666;
-            --menu_container-borderColor: #0009;
-            --menu_container-borderRadius: 20px;
-            --menu_container-borderThickness: 1px;
-
-            --customize-background: #888;
-            --customize-border-color: #333;
-            --customize-border-radius: 5px;
-            --customize-border-thickness: 2px;
-            --customize-shadow-color: #000;
-            --customize-shadow-offsetY: 2px;
-            --customize-shadow-offsetX: 0;
-            --customize-shadow-blur: 2px;
-
-            --levelSelector-background: #222;
-            --levelSelector-text: #fff;
-            --levelSelector_circleLevel-background:#aaa;
-            --levelSelector_circleLevel-shadow:#000;
-            --levelSelector_circleLevel-color:#000;
-
-            --backButton-background: #111;
-            --backButton-text: #fff;
-            --backButton-border: #000;
-            --backButton-borderRadius: 5px;
-            --backButton-borderThickness: 1px;
-            --backButton-shadow: #000;
-            --backButton-shadow-offsetY: 2px;
-            --backButton-shadow-offsetX: 0;
-            --backButton-shadow-blur: 5px;
-            
-            --game-background: #fff;
-            --game-text: #000;
-        }
-    </style>
     
     <div style="display:none">
         <link href="index.css" rel="stylesheet">
@@ -150,6 +108,45 @@ document.getElementsByTagName("html")[0].innerHTML = `
 `
 
 document.getElementsByTagName("head")[0].innerHTML = `<style>
+
+        :root {
+            --menu-background:#aaa;
+            --menu-color:#fff;
+            --menu-shadow: #000;
+            --menu_container-background: #ccc;
+            --menu_container-background-top: #ddd;
+            --menu_container-background-bottom: #ccc;
+            --menu_container-shadow: #666;
+            --menu_container-borderColor: #0009;
+            --menu_container-borderRadius: 20px;
+            --menu_container-borderThickness: 1px;
+            --customize-background: #888;
+            --customize-border-color: #333;
+            --customize-border-radius: 5px;
+            --customize-border-thickness: 2px;
+            --customize-shadow-color: #000;
+            --customize-shadow-offsetY: 2px;
+            --customize-shadow-offsetX: 0;
+            --customize-shadow-blur: 2px;
+            --levelSelector-background: #222;
+            --levelSelector-text: #fff;
+            --levelSelector_circleLevel-background:#aaa;
+            --levelSelector_circleLevel-shadow:#000;
+            --levelSelector_circleLevel-color:#000;
+            --backButton-background: #111;
+            --backButton-text: #fff;
+            --backButton-border: #000;
+            --backButton-borderRadius: 5px;
+            --backButton-borderThickness: 1px;
+            --backButton-shadow: #000;
+            --backButton-shadow-offsetY: 2px;
+            --backButton-shadow-offsetX: 0;
+            --backButton-shadow-blur: 5px;
+            
+            --game-background: #fff;
+            --game-text: #000;
+        }
+
 :focus {outline:none}
 input {border: none;border-radius: 0;}
 .full input, .full div, .full span {position:fixed}
