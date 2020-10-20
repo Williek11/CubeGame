@@ -2,14 +2,215 @@
 <html>
 
 <head>
-    <title>Williek's Playground</title>
-    <link href="index.css" rel="stylesheet">
+    <title>William's Playground</title>
+    <script>
+    if(localStorage.knowV2 === undefined) {
+        localStorage.knowV1 = undefined
+        localStorage.knowV2 = true
+        localStorage.active = JSON.stringify([false, false, false])
+        localStorage.customColors = JSON.stringify({
+                HTML: {
+                    menu: {
+                        background: "#aaa",
+                        color: "#fff",
+                        textShadow: "#000",
+                        container: {
+                            background: "#ccc",
+                            background_top: "#ddd",
+                            background_bottom: "#ccc",
+                            shadow: "#666",
+                            borderColor: "#000",
+                            borderRadius: "20px",
+                            borderThickness: "0",
+                        }
+                    },
+                    levelSelector: {
+                        background: "#222",
+                        text: "#fff",
+                        circleLevel: {
+                            background: "#aaa",
+                            shadow: "#000",
+                            color: "#000"
+                        }
+                    },
+                    backButton: {
+                        background: "#111",
+                        text: "#fff",
+                        border: "#000",
+                        borderRadius: "5px",
+                        borderThickness: "1px",
+                        shadow: "#000",
+                        shadowOffsetY: "2px",
+                        shadowOffsetX: "0",
+                        shadowBlur: "5px",
+                    },
+                    game: {
+                        background: "#fff",
+                        text: "#000",
+                    }
+                },
+                entities: {
+                    enemy: {
+                        normal: "#FF0000",
+                        hit: "#AA0000",
+                    },
+                    bonus: {
+                        health: "#FFFF00",
+                    },
+                    bonusMove: {
+                        slow: "#000000"
+                    },
+                    projectile: {
+                        bullet: "#FF00FF",
+                        missile: "#FF881C"
+                    }
+                }
+            })
+    }
+    </script>
+    <style id="colorStyle">
+        :root {
+            --menu-background:#aaa;
+            --menu-color:#fff;
+            --menu-shadow: #000;
+            --menu_container-background: #ccc;
+            --menu_container-background-top: #ddd;
+            --menu_container-background-bottom: #ccc;
+            --menu_container-shadow: #666;
+            --menu_container-borderColor: #0009;
+            --menu_container-borderRadius: 20px;
+            --menu_container-borderThickness: 1px;
+
+            --customize-background: #888;
+            --customize-border-color: #333;
+            --customize-border-radius: 5px;
+            --customize-border-thickness: 2px;
+            --customize-shadow-color: #000;
+            --customize-shadow-offsetY: 2px;
+            --customize-shadow-offsetX: 0;
+            --customize-shadow-blur: 2px;
+
+            --levelSelector-background: #222;
+            --levelSelector-text: #fff;
+            --levelSelector_circleLevel-background:#aaa;
+            --levelSelector_circleLevel-shadow:#000;
+            --levelSelector_circleLevel-color:#000;
+
+            --backButton-background: #111;
+            --backButton-text: #fff;
+            --backButton-border: #000;
+            --backButton-borderRadius: 5px;
+            --backButton-borderThickness: 1px;
+            --backButton-shadow: #000;
+            --backButton-shadow-offsetY: 2px;
+            --backButton-shadow-offsetX: 0;
+            --backButton-shadow-blur: 5px;
+            
+            --game-background: #fff;
+            --game-text: #000;
+        }
+    </style>
+    
+    <div style="display:none">
+        <link href="index.css" rel="stylesheet">
+    </div>
 </head>
 
 <body>
-    <span id="health">You have 10 points of health</span>
-    <canvas id="canvas"></canvas>
-    <script src="index.js"></script>
+    <div id="menu">
+        <div id="select">
+            <h2 style="margin-top:75px">Cube Game</h2>
+            <p onclick="menu.selectToSelector()">Start</p>
+            <p onclick="menu.selectToSettings()">Settings</p>
+        </div>
+        <div id="settings">
+            <div class="menu_container" id="settings_menu">
+                <div onclick="menu.settingsToCustomize()" id="customize" class="selector_option"><span class="textMiddle">Customize</span></div>
+                <div id="visuals" class="selector_option"><span class="textMiddle">Visuals</span></div>
+            </div>
+            <div class="menu_container" id="customize_menu">
+                <div class="selector_option">
+                    <h2>Customization</h2>
+                    <h3>Color Themeing</h3>
+                    <div class="switch" style="top: 85px;"><div class="ball inactive" onclick="themes(0, 0)"></div></div>
+                    <div class="switch_name" style="top:110px">Dark Mode</div>
+            
+                    <div class="switch" style="top: 155px;"><div class="ball inactive" onclick="themes(1, 1)"></div></div>
+                    <div class="switch_name" style="top:180px">Black and White Mode</div>
+                    
+                    <!-- Unused
+                    <div class="switch" style="top: 225px"><div class="ball inactive" onclick="themes(2, 2)"></div></div>
+                    <div class="switch_name" style="top:250px">Custom Mode</div>
+                    <div id="customizeButton" onclick="menu.customizeToCustomizeMenu()">Customize</div>
+                    -->
+                </div>
+                <div class="selector_option"></div>
+            </div>
+
+        <!-- Unused
+            <div id="customization" class="menus_customization">
+                <div onclick="menu.customizeMenuToMenuCustomization()" class="customization1" style="border-radius:var(--menu_container-borderRadius) 0 0 0"><span class="textMiddle">Menu</span></div>
+                <div class="customization1" style="position:absolute;left:50%;top:0;border-radius:0 var(--menu_container-borderRadius) 0 0"><span class="textMiddle">Level Selector</span></div>
+                <div class="customization2" style="border-radius:0 0 0 var(--menu_container-borderRadius)"><span class="textMiddle">Back button</span></div>
+                <div class="customization2" style="position:absolute;left:50%;top:50%;border-radius: 0 0 var(--menu_container-borderRadius) 0"><span class="textMiddle">Game</span></div>
+            </div>
+            <div id="customize_menu2" class="menus_customization">
+                <div class="customization1" style="border-radius:var(--menu_container-borderRadius) 0 0 0"></div>
+                <div class="customization1" style="position:absolute;left:50%;top:0;border-radius:0 var(--menu_container-borderRadius) 0 0"></div>
+                <div class="customization2" style="border-radius:0 0 0 var(--menu_container-borderRadius)"></div>
+                <div class="customization2" style="position:absolute;left:50%;top:50%;border-radius: 0 0 var(--menu_container-borderRadius) 0"></div>
+                <div class="full">
+                    <h2>Menu Customization</h2>
+                    <span style="left:60px;top:65px">Background Color</span>
+                    <input type="text" style="left:60px;top:90px" id="menu_background-color"/>
+
+                    <span style="left:60px;top:120px">Text Color</span>
+                    <input type="text" style="left:60px;top:145px" id="menu_text-color"/>
+
+                    <span style="left:60px;top:165px">Box-Shadow Color</span>
+                    <input type="text" style="left:60px;top:190px" id="menu_shadow-color"/>
+
+                    <h3 style="position: absolute;left: 50%;top: 65px;margin: 0;font-size: 20px;width: 50%;">Container</h3>
+                    <span style="left:50%;top:90px">Background Color</span>
+                    <input type="text" style="left:50%;top:115px" id="menu_background-color"/>
+                </div>
+            </div>
+            <div id="customize_levelSelector" class="menus_customization">e</div>
+            <div id="customize_backButton" class="menus_customization">c</div>
+            <div id="customize_game" class="menus_customization">d</div>
+        -->
+        </div>
+        <div id="selector">
+            <div class="menu_container" id="typeOfLevel">
+                <div onclick="menu.selectToLevel()" id="levels" class="selector_option"><span class="textMiddle">Levels</span></div>
+                <div id="customLevels" class="selector_option"><span class="textMiddle">Custom Levels (not done)</span></div>
+                <!-- onclick="menu.typeOfLevelToCustomizedLevels()" -->
+            </div>
+            <div class="menu_container" id="customizedLevels">
+                <div id="create" class="selector_option"><span class="textMiddle">Create a Custom Level</span></div>
+                <div id="enter" class="selector_option"><span class="textMiddle">Enter a Custom Level</span></div>
+            </div>
+        </div>
+    </div>
+    <div id="levelSelector">
+        <h2 style="position: fixed;text-align: center;width: 100%;">Levels</h2>
+    </div>
+    <div id="back">Back</div>
+    <div id="game">
+        <div id="game_background"></div>
+        <p id="health">You have 10 points of health</p>
+        <div id="additionalText"></div>
+        <canvas id="canvas"></canvas>
+        <div id="exitLevel">Exit</div>
+    </div>
+    <div style="display:none">
+        <script src="JS/objects.js"></script> <!-- Just makes shortcuts for DOM manipulation and other things -->
+        <script src="JS/colors.js"></script> <!-- Always above entities.js and game.js -->
+        <script src="JS/menu.js"></script> <!-- Must always be above game and levels -->
+        <script src="JS/levels.js"></script> <!-- Must be above game and below menu -->
+        <script src="JS/entities.js"></script> <!-- Entities -->
+        <script src="JS/game.js"></script> <!-- Must be the lowest one for reasons -->
+    </div>
 </body>
 
 </html>
