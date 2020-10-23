@@ -39,7 +39,7 @@ body, html {margin:0;padding:0;text-align:center;font-family:Oxanium;overflow:hi
 #levelSelector::-webkit-scrollbar-track {background-color:transparent}
 #levelSelector::-webkit-scrollbar {width:13px}
 
-.levelCircle {position:relative;width:50px;height:50px;background:var(--levelSelector_circleLevel-background);border-radius:50%;box-shadow: 0 2px 5px var(--levelSelector_circleLevel-shadow);line-height:50px;color:var(--levelSelector_circleLevel-color);font-weight:100;}
+.levelCircle {width:50px;height:50px;background:var(--levelSelector_circleLevel-background);border-radius:50%;box-shadow: 0 2px 5px var(--levelSelector_circleLevel-shadow);line-height:50px;color:var(--levelSelector_circleLevel-color);font-weight:100;}
 
 #back, #exitLevel {position:fixed;background:var(--backButton-background);border: var(--backButton-borderThickness) var(--backButton-border) solid;border-radius: var(--backButton-borderRadius);box-shadow: var(--backButton-shadow-offsetX) var(--backButton-shadow-offsetY) var(--backButton-shadow-blur) var(--backButton-shadow);color:var(--backButton-text);width:70px;height:30px;font-size:17px;line-height:30px;text-align:center;}
 #back {left:10px;bottom:10px;}
@@ -64,6 +64,36 @@ body, html {margin:0;padding:0;text-align:center;font-family:Oxanium;overflow:hi
     top:285px;
     box-shadow:none;
 }
+
+.consoleError {
+    background:#f55b49;
+    border:2px #752a22 solid;
+    width:150px;
+    height:150px;
+    position:absolute;
+    right: 40px;
+    bottom: 40px;
+    text-align:left;
+    color:#fff;
+}
+
+.consoleError h2 {margin: 5px 0 0 25px;}
+.consoleError span {margin: 2.5px 0 0 20px;}
+
+.consoleMessage {
+    background:#222;
+    box-shadow: 0 3px 4px #000 solid;
+    width:150px;
+    height:150px;
+    position:absolute;
+    right: 40px;
+    bottom: 40px;
+    text-align:left;
+    color:#fff;
+}
+
+.consoleMessage h2 {margin: 5px 0 0 25px;}
+.consoleMessage span {margin: 2.5px 0 0 20px;}
 
 @media only screen and (max-height:550px) {
     .menu_container {top:calc(50% - calc(175px + var(--menu_container-borderThickness)))}
@@ -106,9 +136,20 @@ body, html {margin:0;padding:0;text-align:center;font-family:Oxanium;overflow:hi
 @keyframes opAppear {from{opacity:0} to{opacity:1}}
 
 @keyframes upDown {
-    0% {top:10px}
-    50% {top:-10px}
-    100% {top:10px}
+    0% {transform:translateY(15px)}
+    50% {transform:translateY(-15px)}
+    100% {transform:translateY(15px)}
 }
+
+@keyframes appearGameConsole {
+    from {opacity:0;transform: translateX(200px);}
+    to {opacity:1;}
+}
+
+@keyframes disappearGameConsole {
+    from {opacity:1;}
+    to {opacity:0;transform: translateX(200px);}
+}
+
 
 * {font-weight:600}

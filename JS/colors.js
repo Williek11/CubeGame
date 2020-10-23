@@ -31,7 +31,7 @@ colors = {
 
         BB().background = "#111";BB().text = "#fff";BB().border = "#000";BB().borderRadius = "5px";BB().borderThickness = "1px";BB().shadow = "#000";BB().shadowOffsetY = "2px";BB().shadowOffsetX = "0";BB().shadowBlur = "5px";
 
-        H().game.background = "#fff";H().game.text = "#000";
+        H().game.background = "#111";H().game.text = "#fff";H().game.gridLevel = "#000"
 
         MCC().background = "#888888";MCC().borderRadius = "5px";MCC().borderColor = "#333333";MCC().borderThickness = "2px";MCC().shadowOffsetX = "0";MCC().shadowOffsetY = "2px";MCC().shadowBlur = "2px";MCC().shadowColor = "#000"
 
@@ -89,8 +89,9 @@ colors = {
             shadowBlur: "5px",
         },
         game: {
-            background: "#fff",
-            text: "#000",
+            background: "#111",
+            gridLevel: "#000",
+            text: "#fff",
         }
     },
     entities: {
@@ -154,44 +155,44 @@ colors = {
     }
 },
 
-colorsFunc = [()=>{
-    const H = ()=>{return colors.HTML},
-    M = ()=>{return H().menu},
-    MC = ()=>{return M().container},
-    LS = ()=>{return H().levelSelector},
-    MCC = ()=>{return MC().customize}
+colorsFunc = [
+    () => {
+        const H = () => { return colors.HTML },
+        M = () => { return H().menu },
+        MC = () => { return M().container },
+        LS = () => { return H().levelSelector },
+        MCC = () => { return MC().customize }
 
-    active = [true, false, false]
-    localStorage.active = JSON.stringify(active)
+        active = [true, false, false]
+        localStorage.active = JSON.stringify(active)
 
-    M().background = "#1a1a1a"
-    MC().background = "#000"
-    MC().background_top = "#141414"
-    MC().background_bottom = "#0e0e0e"
-    MC().shadow = "#000"
-    MC().borderThickness = "1px"
-    LS().background = "#111"
-    H().game.background = "#111"
-    H().game.text = "#fff"
+        M().background = "#1a1a1a"
+        MC().background = "#000"
+        MC().background_top = "#141414"
+        MC().background_bottom = "#0e0e0e"
+        MC().shadow = "#000"
+        MC().borderThickness = "1px"
+        LS().background = "#111"
+        H().game.text = "#fff"
 
-    MCC().background = "#050505"
-    MCC().borderRadius = "3px"
-    MCC().borderColor = "#000"
-    MCC().borderThickness = "2px"
-    MCC().shadowOffsetX = "0"
-    MCC().shadowOffsetY = "2px"
-    MCC().shadowBlur = "2px"
-    MCC().shadowColor = "#000"
+        MCC().background = "#050505"
+        MCC().borderRadius = "3px"
+        MCC().borderColor = "#000"
+        MCC().borderThickness = "2px"
+        MCC().shadowOffsetX = "0"
+        MCC().shadowOffsetY = "2px"
+        MCC().shadowBlur = "2px"
+        MCC().shadowColor = "#000"
 
-    colors.entities.bonusMove.slow = "#ffffff"},
-    ()=>{
+        colors.entities.bonusMove.slow = "#ffffff"
+    },
+    () => {
         active = [false, true, false]
         localStorage.active = JSON.stringify(active)
 
-        const H = ()=>{return colors.HTML},
-        CE = ()=>{return colors.entities}
+        const H = () => { return colors.HTML },
+            CE = () => { return colors.entities }
 
-        H().game.background = "#111"
         H().game.text = "#fff"
         CE().bonus.health = "#707070"
         CE().bonusMove.slow = "#FFFFFF"
