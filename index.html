@@ -204,36 +204,13 @@
         <div id="exitLevel">Exit</div>
         <div id="game_console"></div>
     </div>
-    <div style="display:none">
-        <script>
-            console.log("you did it")
-            const newScript = ()=>{return document.createElement("script")}
-            const appendScript = (script)=>{document.getElementsByTagName("body")[0].appendChild(script)}
-            const script1 = newScript()
-            script1.src = "JS/objects.js"
-            appendScript(script1)
-            const script2 = newScript()
-            script1.src = "JS/colors.js"
-            appendScript(script2)
-            const script3 = newScript()
-            script1.src = "JS/menu.js"
-            appendScript(script3)
-            const script4 = newScript()
-            script1.src = "JS/levels.js"
-            appendScript(script4)
-            const script5 = newScript()
-            script1.src = "JS/entities.js"
-            appendScript(script5)
-            const script6 = newScript()
-            script1.src = "JS/game.js"
-            appendScript(script6)
-        </script>
-        <script src="JS/objects.js"></script> <!-- Just makes shortcuts for DOM manipulation and other things -->
-        <script src="JS/colors.js"></script> <!-- Always above entities.js and game.js -->
-        <script src="JS/menu.js"></script> <!-- Must always be above game and levels -->
-        <script src="JS/levels.js"></script> <!-- Must be above game and below menu -->
-        <script src="JS/entities.js"></script> <!-- Entities -->
-        <script src="JS/game.js"></script> <!-- Must be the lowest one for reasons -->
+    <div style="display:none">=
+        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/objects.js"></script> <!-- Just makes shortcuts for DOM manipulation and other things -->
+        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/colors.js"></script> <!-- Always above entities.js and game.js -->
+        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/menu.js"></script> <!-- Must always be above game and levels -->
+        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/levels.js"></script> <!-- Must be above game and below menu -->
+        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/entities.js"></script> <!-- Entities -->
+        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/game.js"></script> <!-- Must be the lowest one for reasons -->
     </div>
 </body>
 
