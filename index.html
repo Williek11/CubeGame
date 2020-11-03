@@ -223,7 +223,6 @@
             function add(url) {
                 var js = document.createElement('script');
                 js.setAttribute('type', 'text/javascript');
-                js.setAttribute('id', 'modscript_' + id);
                 js.setAttribute('src', 'https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/'+url);
                 document.head.appendChild(js);
                 console.log('Loaded');
