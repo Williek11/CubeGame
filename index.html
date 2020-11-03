@@ -219,12 +219,22 @@
                     })
             }
         </script>
-        <script src="JS/objects.js"></script>  <!-- Just makes shortcuts for DOM manipulation and other things -->
-        <script src="JS/colors.js"></script>   <!-- Always above entities.js and game.js -->
-        <script src="JS/menu.js"></script>     <!-- Must always be above game and levels -->
-        <script src="JS/levels.js"></script>   <!-- Must be above game and below menu -->
-        <script src="JS/entities.js"></script> <!-- Entities -->
-        <script src="JS/game.js"></script>     <!-- Must be the lowest one for reasons -->
+        <script>
+            function add(url) {
+                var js = document.createElement('script');
+                js.setAttribute('type', 'text/javascript');
+                js.setAttribute('id', 'modscript_' + id);
+                js.setAttribute('src', 'https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/'+url);
+                document.head.appendChild(js);
+                console.log('Loaded');
+            }
+            add('objects.js')
+            add('colors.js')
+            add('menu.js')
+            add('levels.js')
+            add('entities.js')
+            add('game.js')
+        </script>
     </div>
 </body>
 
