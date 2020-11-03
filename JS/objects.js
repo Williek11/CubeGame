@@ -24,4 +24,29 @@ $D = [
     (c, i) => { const s = $D[0]('style'); s.id = i; s.innerHTML = c; Í[0].appendChild(s) }, // 5 ~ add CSS
     (i) => { $D[0](i).innerHTML }, // 6 ~ change CSS
     (c) => { return document.getElementsByClassName(c) }, // 7
-];
+],
+
+id = {
+    count: 0,
+    new: ()=>{id.count++;return id.count;},
+    reduce: ()=>{id.count--},
+},
+
+valid = (nmb, func)=>{
+    if(nmb == null || isNaN(nmb) || nmb == Infinity) {
+        let definition;
+        if(nmb == null) {
+            definition = "null or undefined";
+        } else if (isNaN(nmb)) {
+            definition = "Not a Number (NaN)";
+        } else if (nmb == Infinity) {
+            definition = "Infinity";
+        }
+        console.error("[Debug]: Value of "+nmb+" is equal to "+definition+" on "+func+". Happened at "+new Date()+".");
+    } else if (nmb != 0) {
+        return true;
+    }
+};
+
+let maxBossLevel = parseInt(localStorage.bossLevel);
+let theLastBossLevel = false;

@@ -3,71 +3,7 @@
 
 <head>
     <title>William's Playground</title>
-    <script>
-    if(localStorage.knowV2 === undefined) {
-        localStorage.knowV1 = undefined
-        localStorage.knowV2 = true
-        localStorage.active = JSON.stringify([false, false, false])
-        localStorage.customColors = JSON.stringify({
-                HTML: {
-                    menu: {
-                        background: "#aaa",
-                        color: "#fff",
-                        textShadow: "#000",
-                        container: {
-                            background: "#ccc",
-                            background_top: "#ddd",
-                            background_bottom: "#ccc",
-                            shadow: "#666",
-                            borderColor: "#000",
-                            borderRadius: "20px",
-                            borderThickness: "0",
-                        }
-                    },
-                    levelSelector: {
-                        background: "#222",
-                        text: "#fff",
-                        circleLevel: {
-                            background: "#aaa",
-                            shadow: "#000",
-                            color: "#000"
-                        }
-                    },
-                    backButton: {
-                        background: "#111",
-                        text: "#fff",
-                        border: "#000",
-                        borderRadius: "5px",
-                        borderThickness: "1px",
-                        shadow: "#000",
-                        shadowOffsetY: "2px",
-                        shadowOffsetX: "0",
-                        shadowBlur: "5px",
-                    },
-                    game: {
-                        background: "#fff",
-                        text: "#000",
-                    }
-                },
-                entities: {
-                    enemy: {
-                        normal: "#FF0000",
-                        hit: "#AA0000",
-                    },
-                    bonus: {
-                        health: "#FFFF00",
-                    },
-                    bonusMove: {
-                        slow: "#000000"
-                    },
-                    projectile: {
-                        bullet: "#FF00FF",
-                        missile: "#FF881C"
-                    }
-                }
-            })
-    }
-    </script>
+    <style id="loseHealth"></style>
     <style id="colorStyle">
         :root {
             --menu-background:#aaa;
@@ -106,14 +42,11 @@
             --backButton-shadow-offsetX: 0;
             --backButton-shadow-blur: 5px;
             
-            --game-background: #111;
-            --game-text: #000;
+            --game-background: #090710;
+            --game-text: #fff;
         }
     </style>
-    
-    <div style="display:none">
-        <link href="index.css" rel="stylesheet">
-    </div>
+    <link href="index.css" rel="stylesheet">
 </head>
 
 <body>
@@ -194,23 +127,104 @@
     </div>
     <div id="levelSelector">
         <h2 style="position: fixed;text-align: center;width: 100%;">Levels</h2>
+        <div id="theLevels"></div>
     </div>
     <div id="back">Back</div>
     <div id="game">
         <div id="game_background"></div>
         <canvas id="canvas"></canvas>
-        <p id="health">You have 10 points of health</p>
         <div id="additionalText"></div>
         <div id="exitLevel">Exit</div>
         <div id="game_console"></div>
+
+        <div id="cooldowns">
+            <div class="cooldownBorder" id="dashBorder"><div class="cooldownBackground" id="dashBackground"><div class="cooldownFill" id="dashFill"></div></div></div>
+            <div class="cooldownBorder" id="speedBorder"><div class="cooldownBackground" id="speedBackground"><div class="cooldownFill" id="speedFill"></div></div></div>
+        </div>
+
+        <div id="healthBackground"><div id="healthFill"></div></div><div id="healthNew"></div>
+
+        <div id="healthInformation" class="information">
+            <h2>Health</h2>
+            <div></div>
+            <p id="health"></p>
+        </div>
     </div>
-    <div style="display:none">=
-        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/objects.js"></script> <!-- Just makes shortcuts for DOM manipulation and other things -->
-        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/colors.js"></script> <!-- Always above entities.js and game.js -->
-        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/menu.js"></script> <!-- Must always be above game and levels -->
-        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/levels.js"></script> <!-- Must be above game and below menu -->
-        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/entities.js"></script> <!-- Entities -->
-        <script src="https://raw.githubusercontent.com/Williek11/CubeGame/master/JS/game.js"></script> <!-- Must be the lowest one for reasons -->
+
+    <div style="display:none">
+        <script>
+            localStorage.bossLevel = 1;
+            if(localStorage.knowV1 == "undefined") {
+                localStorage.knowV2 = "undefined";
+                localStorage.knowV1 = "";
+                if(localStorage.active === undefined) {localStorage.active = JSON.stringify([false, false, false])};
+                if(localStorage.bossLevel === undefined) {localStorage.bossLevel = 0};
+                localStorage.customColors = JSON.stringify({
+                        HTML: {
+                            menu: {
+                                background: "#aaa",
+                                color: "#fff",
+                                textShadow: "#000",
+                                container: {
+                                    background: "#ccc",
+                                    background_top: "#ddd",
+                                    background_bottom: "#ccc",
+                                    shadow: "#666",
+                                    borderColor: "#000",
+                                    borderRadius: "20px",
+                                    borderThickness: "0",
+                                }
+                            },
+                            levelSelector: {
+                                background: "#222",
+                                text: "#fff",
+                                circleLevel: {
+                                    background: "#aaa",
+                                    shadow: "#000",
+                                    color: "#000"
+                                }
+                            },
+                            backButton: {
+                                background: "#111",
+                                text: "#fff",
+                                border: "#000",
+                                borderRadius: "5px",
+                                borderThickness: "1px",
+                                shadow: "#000",
+                                shadowOffsetY: "2px",
+                                shadowOffsetX: "0",
+                                shadowBlur: "5px",
+                            },
+                            game: {
+                                background: "#fff",
+                                text: "#000",
+                            }
+                        },
+                        entities: {
+                            enemy: {
+                                normal: "#FF0000",
+                                hit: "#AA0000",
+                            },
+                            bonus: {
+                                health: "#FFFF00",
+                            },
+                            bonusMove: {
+                                slow: "#000000"
+                            },
+                            projectile: {
+                                bullet: "#FF00FF",
+                                missile: "#FF881C"
+                            }
+                        }
+                    })
+            }
+        </script>
+        <script src="JS/objects.js"></script>  <!-- Just makes shortcuts for DOM manipulation and other things -->
+        <script src="JS/colors.js"></script>   <!-- Always above entities.js and game.js -->
+        <script src="JS/menu.js"></script>     <!-- Must always be above game and levels -->
+        <script src="JS/levels.js"></script>   <!-- Must be above game and below menu -->
+        <script src="JS/entities.js"></script> <!-- Entities -->
+        <script src="JS/game.js"></script>     <!-- Must be the lowest one for reasons -->
     </div>
 </body>
 

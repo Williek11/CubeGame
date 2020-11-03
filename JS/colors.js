@@ -31,17 +31,18 @@ colors = {
 
         BB().background = "#111";BB().text = "#fff";BB().border = "#000";BB().borderRadius = "5px";BB().borderThickness = "1px";BB().shadow = "#000";BB().shadowOffsetY = "2px";BB().shadowOffsetX = "0";BB().shadowBlur = "5px";
 
-        H().game.background = "#111";H().game.text = "#fff";H().game.gridLevel = "#000"
+        H().game.background = "#090710";H().game.text = "#fff";H().game.gridLevel = "#010103"
 
         MCC().background = "#888888";MCC().borderRadius = "5px";MCC().borderColor = "#333333";MCC().borderThickness = "2px";MCC().shadowOffsetX = "0";MCC().shadowOffsetY = "2px";MCC().shadowBlur = "2px";MCC().shadowColor = "#000"
 
-        colors.entities.player = "#00FF00"
-        colors.entities.enemy.normal = "#FF0000"
-        colors.entities.enemy.hit = "#AA0000"
-        colors.entities.bonus.health = "#FFFF00"
-        colors.entities.bonusMove.slow = "#000000"
-        colors.entities.projectile.bullet = "#FF00FF"
-        colors.entities.projectile.missile = "#FF881C"
+        colors.entities.player = "#00FF00";
+        colors.entities.enemy.normal = "#FF0000";
+        colors.entities.enemy.hit = "#AA0000";
+        colors.entities.enemy.highLight = "770000";
+        colors.entities.bonus.health = "#FFFF00";
+        colors.entities.bonusMove.slow = "#ffffff";
+        colors.entities.projectile.bullet = "#FF00FF";
+        colors.entities.projectile.missile = "#FF881C";
     },
     HTML: {
         menu: {
@@ -89,8 +90,8 @@ colors = {
             shadowBlur: "5px",
         },
         game: {
-            background: "#111",
-            gridLevel: "#000",
+            background: "#090710",
+            gridLevel: "#010103",
             text: "#fff",
         }
     },
@@ -99,12 +100,13 @@ colors = {
         enemy: {
             normal: "#FF0000",
             hit: "#AA0000",
+            highLight: "#770000",
         },
         bonus: {
             health: "#FFFF00",
         },
         bonusMove: {
-            slow: "#000000"
+            slow: "#ffffff"
         },
         projectile: {
             bullet: "#FF00FF",
@@ -184,6 +186,7 @@ colorsFunc = [
         MCC().shadowBlur = "2px"
         MCC().shadowColor = "#000"
 
+        colors.entities.enemy.highLight = "#770000"
         colors.entities.bonusMove.slow = "#ffffff"
     },
     () => {
@@ -198,6 +201,7 @@ colorsFunc = [
         CE().bonusMove.slow = "#FFFFFF"
         CE().enemy.hit = "#808080"
         CE().enemy.normal = "#a3a3a3"
+        CE().enemy.highLight = "#5a5a5a"
         CE().projectile.bullet = "#dfdfdf"
         CE().projectile.missile = "#4d4d4d"
         CE().player = "#FFFFFF"

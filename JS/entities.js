@@ -25,26 +25,6 @@ const map = {
     }
 },
 
-gameConsole = {
-    new: {
-        log: (className, title, content)=>{
-            const doc = document.createElement("div");
-            doc.className = className;
-            doc.style.animation = "appearGameConsole 1 .5s";
-            doc.innerHTML = '<h2>'+title+'</h2><span>At x:'+Math.round(player.x)+', y:'+Math.round(player.y)+'</span><br/><span>'+content+'</span>';
-            const game_console = document.getElementById("game_console");
-            game_console.appendChild(doc);
-            setTimeout(()=>{doc.style.animation="disappearGameConsole 1 .5s";setTimeout(()=>{game_console.removeChild(doc)},400)},2500)
-        },
-        message: (content)=>{
-            gameConsole.new.log("consoleMessage", "Message", content)
-        },
-        error: (content)=>{
-            gameConsole.new.log("consoleError", "Error", content)
-        },
-    }
-},
-
 constructors = {
     event: (name, key, condition, whenHappen, whenNo) => {
         return {
@@ -64,21 +44,39 @@ constructors = {
             on: false,
         }
     },
-    text: (font, size, x, y, content) => {
-        game.text.all.push({
-            font:font,
-            size:size,
+    mouseEventHover: (id, x, y, width, height, onEvent, onStop, onResize)=>{
+        Game.cursor.events.hover.push({
+            id:id,
+            x:x,
+            y:y,
+            width:width,
+            height:height,
+            onEvent:onEvent,
+            onStop:onStop,
+            onResize:onResize,
+            active: false,
+        })
+    },
+    text: (x, y, content) => {
+        Game.text.all.push({
+            font:Game.text.fontFamily,
+            size:Game.text.fontSize,
             x:x,
             y:y,
             content:content,
         })
     },
     entity: {
-        enemy: function (type, hp, x, y, sX, sY, width, height, dmg, chunk) {
-            game.entities.all.push({
-                chunk: chunk,
+        enemy: function (type, hp, x, y, sX, sY, width, height, dmg, chunk, parentId) {
+            Game.entities.all.push({
+                id: undefined,
+                parentId:parentId,
+                parentAlive: false,
+                chunk: map.all[chunk],
+                chunkNmb: chunk,
                 know: [false, false],
                 hp: hp,
+                totalHP: hp,
                 type: type,
                 x: x,
                 y: y,
@@ -90,20 +88,59 @@ constructors = {
                 noHit: false,
                 width: width,
                 height: height,
+                parentCheck: function () {
+                    parentAlive = false;
+                    for(var i = 0, a = Game.entities.all, l = a.length;i < l;i++) {
+                        if(a[i].id === this.parentId) {
+                            parentAlive = true;
+                            break;
+                        }
+                    }
+                    if(parentAlive === false) {
+                        this.del = true;
+                    }
+                },
+                onHit: function(dmg){
+                    this.hp-=dmg; this.noHit = true; tick = Game.tick;
+                    setTimeout(() => { this.noHit = false }, tick * 40);
+                    if (this.hp <= 0) { this.del = true; if (Math.floor(Math.random() * 5) === 1){constructors.entity.bonus("health", this.x, this.y, this.width, this.height, this.chunkNmb)} }
+                    this.color = colors.entities.enemy.hit; setTimeout(() => { this.color = colors.entities.enemy.normal }, tick * 5)
+                },
                 update: function () {
+                    this.id = id.new();
+                    if(this.parentId === undefined) {this.parentCheck = ()=>{}};
                     if (this.dmg === undefined) { this.dmg = 1 }
                     switch (this.type) {
+                        case "nohealth":
+                            this.onHit = function (dmg) {this.hp-=dmg; this.noHit = true; tick = Game.tick;
+                                setTimeout(() => { this.noHit = false }, tick * 40);
+                                if (this.hp <= 0) { this.del = true; }
+                                this.color = colors.entities.enemy.hit; setTimeout(() => { this.color = colors.entities.enemy.normal }, tick * 5)}
+                            this.update = function () {
+                                this.parentCheck()
+                                Game.ctx.fillStyle = this.color;
+                                let x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y;
+                                Game.ctx.fillRect(map.refX + x, map.refY + y, this.width, this.height);
+                                if (x < chunkX) { this.sX *= -1; x = chunkX } else if (x > chunkX + map.width - this.width) { this.sX *= -1; x = chunkX + map.width - this.width };
+                                if (y < chunkY) { this.sY *= -1; y = chunkY } else if (y > chunkY + map.height - this.height) { this.sY *= -1; y = chunkY + map.height - this.height };
+                                collide(this, () => {
+                                    if (player.events[0].on && !this.noHit) {this.onHit(1)}
+                                    else if (!player.noHit && !player.events[0].on) { player.onHit(this.dmg) }
+                                });
+                                this.x = x + this.sX;
+                                this.y = y + this.sY;
+                            }
+                            break
                         case "generic":
                             this.update = function () {
-                                game.ctx.fillStyle = this.color;
-                                let x = this.x, y = this.y, width = this.width, height = this.height, chunk = map.all[chunk]
-                                game.ctx.fillRect(x, y, width, height);
-                                if (chunk.x < 0) { this.sX *= -1; chunk.x = 0 } else if (chunk.x > map.width - width) { this.sX *= -1; x = map.width - width };
-                                if (y < 0) { this.sY *= -1; y = 0 } else if (y > window.innerHeight - height) { this.sY *= -1; y = window.innerHeight - height };
+                                this.parentCheck()
+                                Game.ctx.fillStyle = this.color;
+                                let x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y;
+                                Game.ctx.fillRect(map.refX + x, map.refY + y, this.width, this.height);
+                                if (x < chunkX) { this.sX *= -1; x = chunkX } else if (x > chunkX + map.width - this.width) { this.sX *= -1; x = chunkX + map.width - this.width };
+                                if (y < chunkY) { this.sY *= -1; y = chunkY } else if (y > chunkY + map.height - this.height) { this.sY *= -1; y = chunkY + map.height - this.height };
                                 collide(this, () => {
-                                    if (player.events[0].on && !this.noHit) {
-                                        if (Math.floor(Math.random() * 5) === 1) { constructors.entity.bonus("health", x, y, width, height) }; this.hp--; this.noHit = true; setTimeout(() => { this.noHit = false }, game.tick * 40); if (this.hp <= 0) { this.del = true }
-                                    }
+                                    if (player.events[0].on && !this.noHit) {this.onHit(1)}
                                     else if (!player.noHit && !player.events[0].on) { player.onHit(this.dmg) }
                                 });
                                 this.x = x + this.sX;
@@ -112,63 +149,68 @@ constructors = {
                             break
                         case "boss1":
                             this.update = function () {
-                                game.ctx.fillStyle = this.color;
-                                game.ctx.fillRect(this.x, this.y, this.width, this.height);
+                                Game.ctx.fillStyle = this.color;
+                                const drawX = map.refX + this.x, drawY = map.refY + this.y
+                                Game.ctx.fillRect(drawX, drawY, this.width, this.height);
+                                Game.ctx.fillRect(drawX - this.width / 2, drawY - 20, (this.width * 2 / this.totalHP) * this.hp, 10)
                                 
                                 if (!this.know[0] && this.hp > 5) {
                                     this.know[0] = true
-                                    setTimeout(() => { this.know[0] = false }, game.tick * 300)
+                                    setTimeout(() => { this.know[0] = false }, Game.tick * 300)
                                     switch (Math.floor(Math.random() * 4)) {
                                         case 0:
-                                            var x, y, width = this.width / 3.5, height = this.height / 3.5, rng = Math.random, summon = constructors.entity.enemy,
-                                            n = (p1, p2)=>{summon("generic", 1, x, y, p1, p2, width, height, 1)},
-                                            f = ()=>{x = this.x + (width / 1.75), y = this.y + (height / 1.75); n(0, -rng() * 5);n(rng() * 5, 0);n(0, rng() * 5);n(-rng() * 5, 0)};
-                                            f(); setTimeout(() => { f() }, game.tick * 40);
+                                            var x, y, width = this.width / 3.5, height = this.height / 3.5, rng = ()=>{return 2.5 + Math.random() * 5}, summon = constructors.entity.enemy,
+                                            n = (p1, p2)=>{summon("generic", 1, x, y, p1, p2, width, height, 1, this.chunkNmb, this.id)},
+                                            f = ()=>{x = this.x + (width / 1.75), y = this.y + (height / 1.75); n(0, -rng());n(rng(), 0);n(0, rng());n(-rng(), 0)};
+                                            f(); setTimeout(() => { f() }, Game.tick * 40);
                                             break
                                         case 1:
                                             var x, y, width = this.width / 5, height = this.height / 5, f2 = $F[2], summon = constructors.entity.projectile,
-                                            n = ()=>{summon("bullet", x, y, f2(), f2(), width, height, 1)},
+                                            n = ()=>{summon("bullet", x, y, f2(), f2(), width, height, 1, this.chunkNmb)},
                                             f = () => { x = this.x + (width / 2.5), y = this.y + (height / 2.5); for(let i = 0;i < 50;i++) {n()} };
                                             f();
-                                            setTimeout(() => { f(); setTimeout(() => { f() }, game.tick * 40) }, game.tick * 40);
+                                            setTimeout(() => { f(); setTimeout(() => { f() }, Game.tick * 40) }, Game.tick * 40);
                                             break
                                         case 2:
-                                            var x,y,width = this.width/3,height = this.height/3, rng = Math.random, summon = constructors.entity.projectile,
-                                            n = (p1, p2)=>{summon("missile", x, y, p1, p2, width, height, 5)},
-                                            f = () => { x = this.x + width/1.5, y = this.y + height/1.5; n(0, -rng() * 5);n(rng() * 5, 0);n(0, rng() * 5);n(-rng() * 5, 0)};
+                                            var x,y,width = this.width/3,height = this.height/3, rng = ()=>{return 2.5 + Math.random() * 2.5}, summon = constructors.entity.projectile,
+                                            n = (p1, p2)=>{summon("missile", x, y, p1, p2, width, height, 5, this.chunkNmb)},
+                                            f = () => { x = this.x + width/1.5, y = this.y + height/1.5; n(0, -rng());n(rng(), 0);n(0, rng());n(-rng(), 0)};
                                             f();
-                                            setTimeout(() => { f() }, game.tick * 40);
+                                            setTimeout(() => { f() }, Game.tick * 40);
                                             break
                                         case 3:
-                                            constructors.entity.bonusMove("slow", this.x + (this.width / 4), this.y + (this.height / 4), $F[2](), $F[2](), this.width / 2, this.height / 2);
+                                            constructors.entity.bonusMove("slow", this.x + (this.width / 4), this.y + (this.height / 4), $F[2](), $F[2](), this.width / 2, this.height / 2, this.chunkNmb, this.id);
                                     }
                                 } else if (this.hp <= 5) {
-                                    this.update = function () {game.ctx.fillStyle = this.color; game.ctx.fillRect(this.x, this.y, this.width, this.height)
-                                        let x, y, width = this.width / 5, height = this.height / 5, f2 = $F[2], t = game.tick,
+                                    this.update = function () {Game.ctx.fillStyle = this.color; Game.ctx.fillRect(map.refX + this.x, map.refY + this.y, this.width, this.height);
+                                        var x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y;
+                                        let cx, cy, cwidth = this.width / 5, cheight = this.height / 5, f2 = $F[2], t = Game.tick,
                                         
                                         nH = ()=>{constructors.entity.bonus("health", this.x - 5 + (this.width / 2), this.y - 5 + (this.height / 2), 10, 10)},
                                         summon = constructors.entity.projectile,
-                                        n = ()=>{summon("bullet", x, y, f2(), f2(), width, height, 2)},
-                                        f = ()=>{x = this.x + (this.width / 2.5), y = this.y + (this.height / 2.5); for(let i = 0;i < 25;i++) {n()}},
+                                        chunkNmb = this.chunkNmb,
+                                        n = ()=>{summon("bullet", cx, cy, f2(), f2(), cwidth, cheight, 1, chunkNmb)},
+                                        f = ()=>{cx = this.x + (this.width / 2.5), cy = this.y + (this.height / 2.5); for(let i = 0;i < 25;i++) {n()}},
                                         c = ()=>{this.color = colors.entities.enemy.hit; setTimeout(() => { this.color = colors.entities.enemy.normal }, t * 5)};
-                                        if (this.x < 0) { this.sX *= -1; this.x = 0; c();f() } else if (this.x > window.innerWidth - this.width) { this.sX *= -1; this.x = window.innerWidth - this.width; c(); f() };
-                                        if (this.y < 0) { this.sY *= -1; this.y = 0; c();f() } else if (this.y > window.innerHeight - this.height) { this.sY *= -1; this.y = window.innerHeight - this.height; c(); f() };
+                                        if (x < chunkX) { this.sX *= -1; x = chunkX; c(); f() } else if (x > chunkX + map.width - this.width) { this.sX *= -1; x = chunkX + map.width - this.width; c(); f() };
+                                        if (y < chunkY) { this.sY *= -1; y = chunkY; c(); f() } else if (y > chunkY + map.height - this.height) { this.sY *= -1; y = chunkY + map.height - this.height; c(); f() };
                                         collide(this, ()=>{
                                             c();
                                             if (player.events[0].on && !this.noHit) {nH(); this.hp--; this.noHit = true; setTimeout(() => { this.noHit = false }, t * 40); if (this.hp <= 0) { this.del = true }}
                                             else if (!player.events[0].on && !player.noHit) { player.onHit(this.dmg) }
                                             if (!this.know[1] && this.hp > 0) {setTimeout(() => {
-                                                x = this.x + (this.width / 2.5), y = this.y + (this.height / 2.5); for(let i = 0;i < 200;i++) {n()}; setTimeout(() => { this.know[1] = false }, t * 20) }, t * 20);this.know[1] = true};
+                                                cx = this.x + (this.width / 2.5), cy = this.y + (this.height / 2.5); for(let i = 0;i < 200;i++) {n()}; setTimeout(() => { this.know[1] = false }, t * 20) }, t * 20);this.know[1] = true};
                                         });
-                                        this.x += this.sX;this.y += this.sY;
+                                        this.x = x + this.sX;this.y = y + this.sY;
                                     }
                                 }
-                                var c = ()=>{this.color = colors.entities.enemy.hit; setTimeout(() => { this.color = colors.entities.enemy.normal }, game.tick * 5)}
-                                if (this.x < 0) { this.sX *= -1; this.x = 0; c() } else if (this.x > window.innerWidth - this.width) { this.sX *= -1; this.x = window.innerWidth - this.width; c() }
-                                if (this.y < 0) { this.sY *= -1; this.y = 0; c() } else if (this.y > window.innerHeight - this.height) { this.sY *= -1; this.y = window.innerHeight - this.height; c() }
+                                var x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y;
+                                var c = ()=>{this.color = colors.entities.enemy.hit; setTimeout(() => { this.color = colors.entities.enemy.normal }, Game.tick * 5)}
+                                if (x < chunkX) { this.sX *= -1; x = chunkX; c() } else if (x > chunkX + map.width - this.width) { this.sX *= -1; x = chunkX + map.width - this.width; c() };
+                                if (y < chunkY) { this.sY *= -1; y = chunkY; c() } else if (y > chunkY + map.height - this.height) { this.sY *= -1; y = chunkY + map.height - this.height; c() };
                                 collide(this, ()=>{
                                     var nH = ()=>{constructors.entity.bonus("health", this.x - 5 + (this.width / 2), this.y - 5 + (this.height / 2), 10, 10)}
-                                    if (player.events[0].on && !this.noHit) { nH(); c(); this.hp--; this.noHit = true; setTimeout(() => { this.noHit = false }, game.tick * 40); if (this.hp <= 0) { this.del = true } }
+                                    if (player.events[0].on && !this.noHit) { nH(); c(); this.hp--; this.noHit = true; setTimeout(() => { this.noHit = false }, Game.tick * 40); if (this.hp <= 0) { this.del = true } }
                                     else if (!player.events[0].on && !player.noHit) { c(); player.onHit(this.dmg) }
                                 })
 
@@ -181,8 +223,8 @@ constructors = {
             })
         },
         bonus: function (type, x, y, width, height, chunk) {
-            game.entities.all.push({
-                chunk: chunk,
+            Game.entities.all.push({
+                chunk: map.all[chunk],
                 type: type,
                 x: x,
                 y: y,
@@ -194,10 +236,10 @@ constructors = {
                     switch (this.type) {
                         case "health":
                             this.update = function () {
-                                game.ctx.fillStyle = this.color
-                                game.ctx.fillRect(map.refX + this.x, map.refY + this.y, this.width, this.height);
+                                Game.ctx.fillStyle = this.color;
+                                Game.ctx.fillRect(map.refX + this.x, map.refY + this.y, this.width, this.height);
                                 collide(this, ()=>{
-                                    if(!player.noHit) {this.del = true; if(player.health < 10) {player.onHit(-1);}}
+                                    if(!player.noHit) {this.del = true; if(player.health < player.totalHealth) {player.onHit(-1);}}
                                 })
                             }
                             break
@@ -205,9 +247,10 @@ constructors = {
                 }
             })
         },
-        bonusMove: function (type, x, y, sX, sY, width, height, chunk) {
-            game.entities.all.push({
-                chunk: chunk,
+        bonusMove: function (type, x, y, sX, sY, width, height, chunk, parentId) {
+            Game.entities.all.push({
+                parentId: parentId,
+                chunk: map.all[chunk],
                 type: type,
                 x: x,
                 y: y,
@@ -217,21 +260,35 @@ constructors = {
                 color: colors.entities.bonusMove.slow,
                 width: width,
                 height: height,
+                parentCheck: function () {
+                    parentAlive = false;
+                    for(var i = 0, a = Game.entities.all, l = a.length;i < l;i++) {
+                        if(a[i].id === this.parentId) {
+                            parentAlive = true;
+                            break;
+                        }
+                    }
+                    if(parentAlive === false) {
+                        this.del = true;
+                    }
+                },
                 update: function () {
+                    if(this.parentId === undefined) {this.parentCheck = ()=>{}}
                     switch (this.type) {
                         case "slow":
                             this.update = function () {
-                                game.ctx.fillStyle = this.color
-                                let x = this.x, y = this.y
-                                game.ctx.fillRect(x, y, this.width, this.height)
-                                if (x < 0) { this.sX *= -1; x = 0; } else if (x > window.innerWidth - this.width) { this.sX *= -1; x = window.innerWidth - this.width; }
-                                if (y < 0) { this.sY *= -1; y = 0; } else if (y > window.innerHeight - this.height) { this.sY *= -1; y = window.innerHeight - this.height; }
+                                Game.ctx.fillStyle = this.color;
+                                let x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y;
+                                Game.ctx.fillRect(map.refX + x, map.refY + y, this.width, this.height);
+                                if (x < chunkX) { this.sX *= -1; x = chunkX } else if (x > chunkX + map.width - this.width) { this.sX *= -1; x = chunkX + map.width - this.width };
+                                if (y < chunkY) { this.sY *= -1; y = chunkY } else if (y > chunkY + map.height - this.height) { this.sY *= -1; y = chunkY + map.height - this.height };
                                 collide(this, ()=>{
-                                    this.del = true
+                                    this.del = true;
                                     player.eventByCall[0]()
                                 })
-                                this.x = x + this.sX
-                                this.y = y + this.sY
+                                this.parentCheck();
+                                this.x = x + this.sX;
+                                this.y = y + this.sY;
                             }
                             break
                     }
@@ -239,8 +296,8 @@ constructors = {
             })
         },
         particle: function (type, x, y, sX, sY, width, height, lifespan, chunk) {
-            game.entities.all.push({
-                chunk: chunk,
+            Game.entities.all.push({
+                chunk: map.all[chunk],
                 type: type,
                 x: x,
                 y: y,
@@ -253,32 +310,32 @@ constructors = {
                     setTimeout(() => { this.del = true }, lifespan)
                     switch (this.type) {
                         case "enprisonment":
-                            this.color = colors.entities.bonusMove.slow
+                            this.color = colors.entities.bonusMove.slow;
                             this.update = function () {
-                                game.ctx.fillStyle = this.color
-                                let x = this.x, y = this.y
-                                game.ctx.fillRect(x, y, this.width, this.height)
-                                if (x < 0) { this.sX *= -1; x = 0; } else if (x > window.innerWidth - this.width) { this.sX *= -1; x = window.innerWidth - this.width }
-                                if (y < 0) { this.sY *= -1; y = 0; } else if (y > window.innerHeight - this.height) { this.sY *= -1; y = window.innerHeight - this.height }
-                                this.x = x + this.sX
-                                this.y = y + this.sY
+                                Game.ctx.fillStyle = this.color;
+                                let x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y;
+                                Game.ctx.fillRect(map.refX + x, map.refY + y, this.width, this.height);
+                                if (x < chunkX) { this.sX *= -1; x = 0 } else if (x > chunkX + map.width - this.width) { this.sX *= -1; x = chunkX + map.width - this.width };
+                                if (y < chunkY) { this.sY *= -1; y = 0 } else if (y > chunkY + map.height - this.height) { this.sY *= -1; y = chunkY + map.height - this.height };
+                                this.x = x + this.sX;
+                                this.y = y + this.sY;
                             }
                             break
                         case "explosion":
-                            this.color = colors.entities.projectile.missile
+                            this.color = colors.entities.projectile.missile;
                             this.update = function () {
-                                game.ctx.fillStyle = this.color
-                                let x = this.x, y = this.y
-                                game.ctx.fillRect(this.x, this.y, this.width, this.height)
-                                if (x < 0) { this.sX *= -1; x = 0; } else if (x > window.innerWidth - this.width) { this.sX *= -1; x = window.innerWidth - this.width }
-                                if (y < 0) { this.sY *= -1; y = 0; } else if (y > window.innerHeight - this.height) { this.sY *= -1; y = window.innerHeight - this.height }
+                                Game.ctx.fillStyle = this.color;
+                                let x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y;
+                                Game.ctx.fillRect(map.refX + this.x, map.refY + this.y, this.width, this.height)
+                                if (x < chunkX) { this.sX *= -1; x = chunkX } else if (x > chunkX + map.width - this.width) { this.sX *= -1; x = chunkX + map.width - this.width };
+                                if (y < chunkY) { this.sY *= -1; y = chunkY } else if (y > chunkY + map.height - this.height) { this.sY *= -1; y = chunkY + map.height - this.height };
                                 collide(this, ()=>{
                                     if (!player.noHit) {
-                                        player.onHit(1)
+                                        player.onHit(1);
                                     }
                                 })
-                                this.x = x + this.sX
-                                this.y = y + this.sY
+                                this.x = x + this.sX;
+                                this.y = y + this.sY;
                             }
                             break
                     }
@@ -286,8 +343,10 @@ constructors = {
             })
         },
         projectile: function (type, x, y, sX, sY, width, height, dmg, chunk) {
-            game.entities.all.push({
-                chunk: chunk,
+            Game.entities.all.push({
+                chunk: map.all[chunk],
+                chunkNmb: chunk,
+                id:id.new(),
                 type: type,
                 x: x,
                 y: y,
@@ -295,41 +354,41 @@ constructors = {
                 sX: sX,
                 sY: sY,
                 del: false,
-                color: colors.entities.projectile.bullet,
                 width: width,
                 height: height,
                 update: function () {
                     switch (this.type) {
                         case "bullet":
+                            this.color = colors.entities.projectile.bullet;
                             this.update = function () {
-                                game.ctx.fillStyle = this.color
-                                let x = this.x, y = this.y
-                                game.ctx.fillRect(x, y, this.width, this.height)
-                                if (x < -this.width) { this.del = true; } else if (x > window.innerWidth) { this.del = true }
-                                if (y < -this.height) { this.del = true; } else if (y > window.innerHeight) { this.del = true }
+                                Game.ctx.fillStyle = this.color;
+                                let x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y;
+                                Game.ctx.fillRect(map.refX + x, map.refY + y, this.width, this.height);
+                                if (x < chunkX) { this.del = true } else if (x > chunkX + map.width - this.width) { this.del = true; };
+                                if (y < chunkY) { this.del = true } else if (y > chunkY + map.height - this.height) { this.del = true; };
                                 collide(this, ()=>{
                                     if (!player.noHit) {
-                                        this.del = true
-                                        player.onHit(this.dmg)
+                                        this.del = true;
+                                        player.onHit(this.dmg);
                                     }
                                 })
-                                this.x = x + this.sX
-                                this.y = y + this.sY
+                                this.x = x + this.sX;
+                                this.y = y + this.sY;
                             }
                             break
                         case "missile":
-                            this.color = colors.entities.projectile.missile
+                            this.color = colors.entities.projectile.missile;
                             this.update = function () {
-                                game.ctx.fillStyle = this.color
-                                let x = this.x, y = this.y
-                                game.ctx.fillRect(x, y, this.width, this.height)
+                                Game.ctx.fillStyle = this.color;
+                                let x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y;
+                                Game.ctx.fillRect(map.refX + x, map.refY + y, this.width, this.height);
                                 const explode = () => {
-                                    let tX = x + this.width / 2, tY = y + this.height / 2, t = game.tick, name = "explosion", f0 = $F[0], rng = Math.random, f = ()=>{constructors.entity.particle(name, tX, tY, f0() * 5, f0() * 5, 5 + f0(), 5 + f0(), rng() * 160 * t)}
+                                    let tX = x + this.width / 2, tY = y + this.height / 2, t = Game.tick, name = "explosion", f0 = $F[0], rng = Math.random, f = ()=>{constructors.entity.particle(name, tX, tY, f0() * 5, f0() * 5, 5 + f0(), 5 + f0(), rng() * 160 * t, this.chunkNmb)}
                                     for (let i = 0; i < 10; i++) {f()}
                                     this.del = true
                                 }
-                                if (x < 0) { explode() } else if (x > window.innerWidth - this.width) { explode() }
-                                if (y < 0) { explode() } else if (y > window.innerHeight - this.height) { explode() }
+                                if (x < chunkX) { explode() } else if (x > chunkX + map.width - this.width) { explode(); };
+                                if (y < chunkY) { explode() } else if (y > chunkY + map.height - this.height) { explode(); };
                                 collide(this, ()=>{
                                     if (!player.noHit) {
                                         explode()
@@ -341,6 +400,40 @@ constructors = {
                                 this.y = y + this.sY
                             }
                             break
+                        case "guidedbullet":
+                            this.color = colors.entities.projectile.bullet;
+                            this.slowdown = sX * 20;
+                            this.cooldown = 10;
+                            this.cooldownUpdate = function () {if(!(this.cooldown < 0)){this.cooldown--} else {this.cooldownUpdate=()=>{}}}
+                            this.update = function () {
+                                this.cooldownUpdate();
+                                Game.ctx.fillStyle = this.color;
+                                let x = this.x, y = this.y, chunk = this.chunk, chunkX = chunk.x, chunkY = chunk.y,slowdown=this.slowdown,sX=this.sX,sY=this.sY;
+                                Game.ctx.fillRect(map.refX + x, map.refY + y, this.width, this.height);
+                                if (x < chunkX) { sX *= -1; x = 0 } else if (x > chunkX + map.width - this.width) { sX *= -1; x = chunkX + map.width - this.width };
+                                if (y < chunkY) { sY *= -1; y = 0 } else if (y > chunkY + map.height - this.height) { sY *= -1; y = chunkY + map.height - this.height };
+                                this.sX=sX=(player.x-x)/slowdown;
+                                this.sY=sY=(player.y-y)/slowdown;
+                                this.slowdown=slowdown-.025;
+                                if(this.slowdown <= 1) {this.slowdown = 1;this.del = true}
+                                if(this.cooldown <= 0) {for(var i=0,l=Game.entities.all.length;i<l;i++){
+                                    if (Game.entities.all[i].type != "guidedbullet") {
+                                        const sub = () => { return Game.entities.all[i] }
+                                        if (this.x <= sub().x + sub().width && sub().x <= this.x + this.width && this.y <= sub().y + sub().height && sub().y <= this.y + this.height) {
+                                            this.del = true;
+                                            sub().onHit(1)
+                                        }
+                                    }
+                                }}
+                                collide(this, ()=>{
+                                    if (!player.noHit) {
+                                        this.del = true;
+                                        player.onHit(this.dmg);
+                                    }
+                                })
+                                this.x = x + this.sX;
+                                this.y = y + this.sY;
+                            }
                     }
                 }
             })
@@ -356,68 +449,80 @@ know = [],
 
 player = {
     health: 10,
-    chunk: 0,
+    totalHealth: 10,
+    currentChunkNumber: 0,
+    chunk: undefined,
     x:0,
     y:0,
     iX:0, /* Initial */
     iY:0,
     sX:0, /* Speed (Each tick, your character will move onto a direction this amount) */
     sY:0,
-    lX:6, /* Limit */
-    lY:6,
-    nX:0.6, /* New (if you're moving, you will receive this amount of speed per tick to sX) */
-    nY:0.6,
+    lX:5, /* Limit */
+    lY:5,
+    nX:0.5, /* New (if you're moving, you will receive this amount of speed per tick to sX) */
+    nY:0.5,
     lvl: 0,
     exp: 0,
     color: colors.entities.player,
     width:20,
     height:20,
     onHit:(dmg) => {
-        player.health-=dmg
-        $D[1]("health").innerHTML = `You have ${player.health} points of health`
-        player.noHit = true
-        setTimeout(()=>{player.noHit=false},game.tick * 40)
-        if(player.health <= 0) {
-            game.restart()
-        }
+        if(true === valid(dmg, "function player.onHit")) {player.health-=dmg;
+        $D[1]("health").innerHTML = `You have ${player.health} points of health of a total of ${player.totalHealth}.`;
+        player.noHit = true;
+
+        if(player.health <= 0) {Game.restart();}
+
+        let health = -(100 / player.totalHealth * player.health);
+
+        const healthFill = $D[1]("healthFill");
+        $D[1]("loseHealth").innerHTML = `@keyframes healthLose {from{transform:`+ healthFill.style.transform +`)}to {transform:translateY(`+ health +`%)}}`
+        const gt = Game.tick;const gtb = gt * 40;
+        const healthNew = $D[1]("healthNew");
+        const healthBackground = $D[1]("healthBackground");
+        healthBackground.style.animation = "rotate 1 "+gtb+"ms";
+        if(dmg>0){healthNew.style.animation = "damaged 1 "+gtb+"ms"}else{healthNew.style.animation = "healed 1 "+gtb+"ms"};
+        healthFill.style.animation = "healthLose 1 "+gtb+"ms,rotate";
+        setTimeout(()=>{healthFill.style.transform = "translateY(" + health + "%)";setTimeout(()=>{healthBackground.style = "";healthNew.style="";healthFill.style.animation = "";player.noHit=false;},gt)}, gt * 39)}
     },
     noHit:false,
     events: [
         constructors.event("Dash",
             " ",
-            () => { if (player.events[0].currentCooldown === 0) { return true } else { return false } },
-            () => { player.noHit = true; const self = player.events[0]; self.on = true; self.currentCooldown = 1; player.lX *= 3; player.lY *= 3; player.nX *= 4; player.nY *= 4; setTimeout(() => { self.on = false; player.lX /= 3; player.lY /= 3; player.nX /= 4; player.nY /= 4; setTimeout(()=>{player.noHit = false; setTimeout(()=>{self.currentCooldown = 0 },game.tick * 40)},game.tick * 20)}, game.tick * 10) },
+            () => { return player.events[0].currentCooldown === 0 ? true : false },
+            () => { Game.cooldowns.dash.active = true; document.getElementById("dashBorder").style.display="block";document.getElementById("dashBackground").style.display="block"; player.noHit = true; const self = player.events[0]; self.on = true; self.currentCooldown = 1; player.lX *= 3; player.lY *= 3; player.nX *= 4; player.nY *= 4; setTimeout(() => { self.on = false; player.lX /= 3; player.lY /= 3; player.nX /= 4; player.nY /= 4; setTimeout(()=>{player.noHit = false; setTimeout(()=>{self.currentCooldown = 0 },Game.tick * 40)},Game.tick * 20)}, Game.tick * 10) },
             () => {},
         ),
         constructors.event("Speed",
             "Shift",
-            () => { if (player.events[1].currentCooldown === 0) { return true } else { return false } },
-            () => { const self = player.events[1]; self.on = true; self.currentCooldown = 1; player.lX *= 2; player.lY *= 2;setTimeout(() => { self.on = false; player.lX /= 2; player.lY /= 2; setTimeout(()=>{self.currentCooldown = 0 },game.tick * 160)}, game.tick * 40) },
+            () => { return player.events[1].currentCooldown === 0 ? true : false },
+            () => { Game.cooldowns.speed.active = true; document.getElementById("speedBorder").style.display="block";document.getElementById("speedBackground").style.display="block"; const self = player.events[1]; self.on = true; self.currentCooldown = 1; player.lX *= 2; player.lY *= 2;setTimeout(() => { self.on = false; player.lX /= 2; player.lY /= 2; setTimeout(()=>{self.currentCooldown = 0 },Game.tick * 160)}, Game.tick * 40) },
             () => {},
         ),
     ],
     eventByCall: [
         ()=>{ /* Slow */
             player.lX /= 5; player.lY /= 5; player.nX /= 5; player.nY /= 5
-            const n = ()=>{constructors.entity.particle("enprisonment", player.x + $F[1](), player.y + $F[1](), $F[0](), $F[0](), 5, 5, game.tick * 40)}
+            const n = ()=>{constructors.entity.particle("enprisonment", player.x + $F[1](), player.y + $F[1](), $F[0](), $F[0](), 5, 5, Game.tick * 40, player.currentChunkNumber)}
             const f = () => { for(let i = 0;i < 10;i++) {n()} }
-            const st = (func) => { f(); setTimeout(func, game.tick * 10) }
-            st(() => { st(() => { st(() => { st(() => { st(() => { player.lX *= 5; player.lY *= 5; player.nX *= 5; player.nY *= 5 }, game.tick * 25 ) }) }) }) })
+            const st = (func) => { f(); setTimeout(func, Game.tick * 10) }
+            st(() => { st(() => { st(() => { st(() => { st(() => { player.lX *= 5; player.lY *= 5; player.nX *= 5; player.nY *= 5 }, Game.tick * 25 ) }) }) }) })
         }
     ],
     update: function(){
-        game.ctx.fillStyle = this.color;
+        Game.ctx.fillStyle = this.color;
 
-        let sX = player.sX, sY = player.sY, lY = player.lY, lX = player.lX, keys = game.keys, x = player.x, y = player.y, width = player.width, height = player.height, chunk = map.all[player.chunk], corridor = levels.autoGenerated[game.index].grid.corridor[player.chunk], scaled = 2, margin = 55
-        game.ctx.fillRect(map.x - player.width / 2, map.y - player.height / 2, width, height);
-        game.ctx.fillRect(margin + (x / 8) / scaled - width, margin + (y / 8) / scaled - height, width / scaled, height / scaled);
+        let sX = player.sX, sY = player.sY, lY = player.lY, lX = player.lX, keys = Game.keys, x = player.x, y = player.y, width = player.width, height = player.height, chunk = this.chunk, corridor = levels.autoGenerated[Game.index].grid.corridor[player.currentChunkNumber], scaled = 2, margin = 55
+        Game.ctx.fillRect(map.x - player.width / 2, map.y - player.height / 2, width, height);
+        Game.ctx.fillRect(margin + (x / 8) / scaled - width, margin + (y / 8) / scaled - height, width / scaled, height / scaled);
 
         let playerCalculationsX = ()=>{
             if (sX > lX) { sX = lX } else if (sX < lX * -1) { sX = lX * -1 } else {
                 if (keys.a || keys.ArrowLeft || keys.A) { sX -= player.nX; know[0] = false } else { know[0] = true }
                 if (keys.d || keys.ArrowRight || keys.D) { sX += player.nX; know[1] = false } else { know[1] = true }
-                if (keys.a && keys.A) { game.keys.A = false; game.keys.a = false }
-                if (keys.d && keys.D) { game.keys.D = false; game.keys.d = false }
+                if (keys.a && keys.A) { Game.keys.A = false; Game.keys.a = false }
+                if (keys.d && keys.D) { Game.keys.D = false; Game.keys.d = false }
 
                 if (know[0] && know[1]) { if (sX > 0) { sX -= 0.1 } else if (sX < 0) { sX += 0.1 }}
             }
@@ -427,14 +532,14 @@ player = {
             if (sY > lY) { sY = lY } else if (sY < lY * -1) { sY = lY * -1 } else {
                 if (keys.w || keys.ArrowUp || keys.W) { sY -= player.nY; know[2] = false } else { know[2] = true }
                 if (keys.s || keys.ArrowDown || keys.S) { sY += player.nY; know[3] = false } else { know[3] = true }
-                if (keys.w && keys.W) { game.keys.W = false; game.keys.w = false }
-                if (keys.s && keys.S) { game.keys.S = false; game.keys.s = false }
+                if (keys.w && keys.W) { Game.keys.W = false; Game.keys.w = false }
+                if (keys.s && keys.S) { Game.keys.S = false; Game.keys.s = false }
 
                 if (know[2] && know[3]) { if (sY > 0) { sY -= 0.1 } else if (sY < 0) { sY += 0.1 } }
             }
         }
 
-        /*If corridors not visible*/ if(!game.corridorsVisible) {
+        /*If corridors not visible*/ if(!Game.corridorsVisible) {
             if (x < chunk.x) { sX = 0; x = chunk.x; } else if (x > chunk.x + map.width - width) { sX = 0; x = chunk.x + map.width - width; } else {
                 playerCalculationsX()
             }
@@ -445,27 +550,20 @@ player = {
             /*If in corridor*/
             if (x <= corridor.x + corridor.width && corridor.x <= x + width && y <= corridor.y + corridor.height && corridor.y <= y + height) {                
                 playerCalculationsX();
-                if(game.debugAccess) {gameConsole.new.message("Corridor In")}
 
-                if (y < corridor.y) { sY = 0; y = corridor.y;
-                    if(game.debugAccess) {gameConsole.new.message("Corridor Hit Y+")}
-                }
-                else if (y > corridor.y + corridor.height - height) { sY = 0; y = corridor.y + corridor.height - height;
-                    if(game.debugAccess) {gameConsole.new.message("Corridor Hit Y-") }
-                }
+                if (y < corridor.y) { sY = 0; y = corridor.y;}
+                else if (y > corridor.y + corridor.height - height) { sY = 0; y = corridor.y + corridor.height - height;}
                 else {
                     playerCalculationsY()
                 }
             }
 
             /* If in a square outside corridor */
-
             else if (x <= corridor.x + corridor.width + width + lX
                 && corridor.x <= x + width
                 && y <= corridor.y + corridor.height
                 && corridor.y <= y + height) {
-                game.corridorsVisible = false; player.chunk++;
-                if(game.debugAccess) {gameConsole.new.message("Hit Box End Entered")}
+                Game.corridorsVisible = false; player.currentChunkNumber++; player.chunk = map.all[player.currentChunkNumber];
             }
             
             /*If not on corridor*/
@@ -484,10 +582,10 @@ player = {
             }
         }
 
-        player.sX = sX
-        player.x = x + sX
+        player.sX = sX;
+        player.x = x + sX;
 
-        player.sY = sY
-        player.y = y + sY
+        player.sY = sY;
+        player.y = y + sY;
     }
 };
